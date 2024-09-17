@@ -3,3 +3,6 @@
 rocky.*
 *.exe
 *.out
+*env*
+
+cmd/playground
