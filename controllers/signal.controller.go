@@ -19,7 +19,6 @@ var connected = make(map[string]*user)
 
 func Signal(c echo.Context) error {
 	websocket.Handler(func(ws *websocket.Conn) {
-		slog.Info("new connection", "from", ws.Request().RemoteAddr)
 		defer ws.Close()
 		var userId string
 		err := websocket.Message.Receive(ws, &userId)
@@ -69,11 +68,7 @@ func Signal(c echo.Context) error {
 					continue
 				}
 
-				candidate, ok := incoming["candidate"].(string)
-				if !ok {
-					continue
-				}
-
+				candidate := incoming["candidate"].(map[string]interface{})
 				recipient.Mu.Lock()
 				websocket.JSON.Send(recipient.Ws, JSON{
 					"type":      "ice",
@@ -90,7 +85,7 @@ func Signal(c echo.Context) error {
 					continue
 				}
 
-				offer := incoming["offer"].(string)
+				offer := incoming["offer"].(map[string]interface{})
 				recipient.Mu.Lock()
 				websocket.JSON.Send(recipient.Ws, JSON{
 					"type":  "offer",
@@ -107,7 +102,7 @@ func Signal(c echo.Context) error {
 					continue
 				}
 
-				answer := incoming["answer"].(string)
+				answer := incoming["answer"].(map[string]interface{})
 				recipient.Mu.Lock()
 				websocket.JSON.Send(recipient.Ws, JSON{
 					"type":   "answer",
